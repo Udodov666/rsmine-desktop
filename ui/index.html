@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>RSMine — настройки</title>
+  <style>
+    /* Дизайн 1в1 с панелью: монохром, поверхности различаются только светлотой,
+       без обводок у карточек; единственный цвет — зелёный primary-кнопки. */
+    :root {
+      --bg: #0b0b0c; --surface: #101011; --card: #131315; --panel: #1b1b1e; --raised: #26262b;
+      --text: #f2f2f2; --text2: #b0b0b6; --text3: #7e7e85; --text4: #55555c;
+      --line: rgba(255,255,255,.06); --line2: rgba(255,255,255,.1);
+      --r-sm: 6px; --r-md: 8px; --r-lg: 12px;
+      --green: #10a45a; --green-h: #14a85b; --green-a: #0c9450;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    button { font-family: inherit; border: none; background: none; cursor: pointer; color: inherit; }
+    input { font-family: inherit; }
+    html { color-scheme: dark; background: var(--bg); }
+    body {
+      background: var(--bg); color: var(--text);
+      font: 400 13px/1.45 -apple-system, 'Segoe UI', Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      padding: 24px 24px 28px;
+    }
+    ::selection { background: rgba(255,255,255,.16); }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 8px; border: 3px solid transparent; background-clip: content-box; }
+    ::-webkit-scrollbar-track { background: transparent; }
+
+    /* ── шапка ── */
+    .top { display: flex; align-items: center; gap: 9px; margin-bottom: 20px; }
+    .mark { width: 26px; height: 26px; border-radius: 8px; background: var(--panel);
+      display: flex; align-items: center; justify-content: center; }
+    .mark svg { display: block; }
+    .name { font-size: 15px; font-weight: 600; letter-spacing: .2px; }
+    .relay { margin-left: auto; display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text3); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--raised); }
+    .dot.on { background: var(--green); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: .45; } }
+
+    /* ── карточки и секции ── */
+    .card { background: var(--card); border-radius: var(--r-lg); padding: 20px; }
+    .stack { display: flex; flex-direction: column; gap: 14px; }
+    .pg-title { font-size: 13.5px; font-weight: 600; }
+    .pg-desc { margin-top: 3px; padding-bottom: 12px; margin-bottom: 12px;
+      border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--text3); }
+    .pg-desc a { color: var(--text2); text-decoration: none; }
+    .pg-desc a:hover { color: var(--text); }
+
+    /* ── поля ── */
+    .field { margin-top: 12px; }
+    .field:first-of-type { margin-top: 0; }
+    label { display: block; font-size: 12.5px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+    input {
+      width: 100%; height: 36px; padding: 0 12px; border-radius: var(--r-md);
+      border: 1px solid transparent; background: var(--panel); color: var(--text);
+      font-size: 13px; outline: none; transition: background .12s;
+    }
+    input:hover { background: #1f1f22; }
+    input:focus { background: var(--raised); }
+    input::placeholder { color: var(--text4); font-weight: 400; }
+    input.mono { font-family: ui-monospace, 'Cascadia Mono', 'JetBrains Mono', Menlo, monospace; font-size: 12px; }
+    .hint { font-size: 11.5px; color: var(--text4); margin-top: 6px; line-height: 1.45; }
+
+    /* ── кнопки ── */
+    .btn {
+      height: 36px; padding: 0 18px; border-radius: var(--r-md);
+      background: var(--green); color: #fff; font-size: 13px; font-weight: 500;
+      transition: background .12s;
+    }
+    .btn:hover { background: var(--green-h); }
+    .btn:active { background: var(--green-a); }
+    .btn:disabled { opacity: .5; cursor: default; }
+    .btn.ghost { background: var(--panel); color: var(--text); font-weight: 400; }
+    .btn.ghost:hover { background: var(--raised); }
+    .btn.ghost:active { background: var(--raised); }
+    .foot { display: flex; gap: 10px; margin-top: 16px; }
+
+    /* ── свитч (как SwitchYN в панели) ── */
+    .switch-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+    .switch { position: relative; width: 36px; height: 20px; border-radius: 100px; background: #333338; transition: background .15s; flex: none; }
+    .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #8b8b92; transition: transform .15s, background .15s; }
+    .switch.on { background: #0ea472; }
+    .switch.on::after { transform: translateX(16px); background: #fff; }
+    .switch-label { font-size: 12.5px; color: var(--text2); }
+
+    /* ── табы ── */
+    .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+    .tab { height: 32px; padding: 0 16px; border-radius: 100px; font-size: 12.5px; color: var(--text3); }
+    .tab:hover { color: var(--text); background: var(--panel); }
+    .tab.on { background: var(--raised); color: var(--text); font-weight: 600; }
+    .tab .n { opacity: .65; font-weight: 400; margin-left: 4px; }
+
+    /* ── сообщения (как MsgCard в панели) ── */
+    .drow { display: flex; gap: 12px; padding: 12px 0; }
+    .drow + .drow { border-top: 1px solid var(--line); }
+    .dava { flex: none; width: 38px; height: 38px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; }
+    .dmain { flex: 1; min-width: 0; }
+    .dwho { display: flex; align-items: baseline; gap: 6px; min-width: 0; font-size: 13px; }
+    .dwho .nm { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dwho .sent { color: var(--text3); font-weight: 400; flex: none; }
+    .dwho .sum { font-weight: 600; flex: none; }
+    .dwhen { margin-left: auto; flex: none; font-size: 11px; color: var(--text4); white-space: nowrap; }
+    .dtxt { margin-top: 3px; font-size: 12.5px; color: var(--text2); overflow-wrap: anywhere; }
+    .drow.is-hidden { opacity: .45; }
+    .dact { display: flex; gap: 2px; margin-top: 6px; }
+    .mini { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px;
+      color: var(--text3); padding: 5px 9px; border-radius: 7px; }
+    .mini:hover { color: var(--text); background: var(--panel); }
+    .mini svg { display: block; }
+    .dempty { padding: 18px 0 6px; text-align: center; color: var(--text3); font-size: 12.5px; }
+    .dempty b { display: block; color: var(--text); font-size: 13.5px; margin-bottom: 4px; }
+    .show-hidden { margin-top: 10px; width: 100%; font-size: 12px; color: var(--text3); padding: 8px; border-radius: var(--r-md); }
+    .show-hidden:hover { color: var(--text); background: var(--panel); }
+    .dchips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+    .dchip { font-size: 11px; color: var(--text2); background: var(--panel); border-radius: 100px; padding: 3px 9px; }
+
+    /* ── статусы ── */
+    .status { background: var(--card); border-radius: var(--r-lg); padding: 16px 20px; margin-top: 14px; }
+    .srow { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 12.5px; color: var(--text3); }
+    .srow b { color: var(--text); font-weight: 500; margin-left: auto; }
+    .srow .dot { flex: none; }
+    .ok { color: #22c55e; }
+    .bad { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <span class="mark" style="background:transparent">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 0C26.6274 0 32 5.37258 32 12V20C32 26.6274 26.6274 32 20 32H12C5.37258 32 0 26.6274 0 20V12C0 5.37258 5.37258 0 12 0H20ZM15.6465 6.55273C13.863 5.50511 11.6252 5.99301 10.3857 7.62891C9.16676 9.23823 9.3087 11.3199 10.7803 12.8418C9.02082 13.4385 7.75614 14.6288 6.70605 16.1367C6.61694 16.2905 6.5444 16.4105 6.48145 16.5352C5.16656 19.1378 6.66274 22.0493 9.54102 22.4844C10.7589 22.6684 11.8491 22.381 12.7861 21.5127C13.3454 23.2287 14.4795 24.4164 15.916 25.3232C17.9162 26.5858 20.4159 26.0302 21.6836 24.083C22.1686 23.338 22.3573 22.5068 22.2959 21.6318C22.234 20.7502 21.9539 19.9403 21.2637 19.2783C22.5746 18.7251 23.6997 18.0002 24.5693 16.9307C25.5476 15.7276 26.2083 14.4325 25.9404 12.793C25.4776 9.96074 21.9952 8.46496 19.7275 10.1553C19.5227 10.308 19.3385 10.4889 19.126 10.6729C19.0332 10.46 18.9594 10.2828 18.8799 10.1084C18.182 8.57783 17.0801 7.39485 15.6465 6.55273Z" fill="#0EA472"/>
+      </svg>
+    </span>
+    <span class="name">RSMine</span>
+    <span class="relay"><span class="dot" id="dot"></span><span id="relay-label">—</span></span>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab on" id="tab-settings" role="tab">Настройки</button>
+    <button class="tab" id="tab-donations" role="tab">Сообщения<span class="n" id="don-count"></span></button>
+  </div>
+
+  <div class="stack" id="pane-settings">
+    <div class="card">
+      <div class="pg-title">Аккаунт</div>
+      <div class="pg-desc">Связь программы с твоим аккаунтом RSMine. Секрет — из панели: Подключение → шаг 1.</div>
+      <div class="field">
+        <label>Твой ник на Twitch</label>
+        <input id="slug" placeholder="udodov0" />
+        <div class="hint">Тот же ник, что на Twitch — он же в ссылке твоей страницы доната.</div>
+      </div>
+      <div class="field">
+        <label>App Secret</label>
+        <input id="appSecret" type="password" class="mono" placeholder="32 hex символа" autocomplete="off" />
+        <div class="hint">Вводится звёздочками. Даёт программе право соединяться с твоим аккаунтом; на сервере — только хеш. Пересоздать можно на сайте: Подключение → шаг 1.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="pg-title">Платежи</div>
+      <div class="pg-desc">Счёт зрителю создаёт программа: LZT-токен не покидает этот компьютер.</div>
+      <div class="field">
+        <label>LZT API токен (scopes: invoice, payment)</label>
+        <input id="token" type="password" placeholder="Вставь токен — сохранится в защищённое хранилище Windows" />
+        <div class="hint" id="token-hint"></div>
+      </div>
+      <div class="field">
+        <label>Merchant ID</label>
+        <input id="merchantId" placeholder="ID мерчанта LZT Market" />
+      </div>
+      <div class="foot">
+        <button id="test" class="btn ghost">Проверить LZT</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="pg-title">Озвучка</div>
+      <div class="pg-desc">Ключ Cartesia для голосовых алертов. Где взять:
+        <a href="https://play.cartesia.ai/keys" target="_blank">play.cartesia.ai → API Keys</a> → Create API key.</div>
+      <div class="field">
+        <label>Cartesia API ключ</label>
+        <input id="cartesiaKey" type="password" placeholder="sk_car_… — сохранится в защищённое хранилище Windows" />
+        <div class="hint" id="tts-hint">Ключ уходит только на сервер RSMine и используется для синтеза алертов.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="pg-title">Программа</div>
+      <div class="pg-desc">Сервер API обычно менять не нужно. Автозапуск включает программу вместе с Windows.</div>
+      <div class="field">
+        <label>API base</label>
+        <input id="apiBase" class="mono" placeholder="https://rsmine-api.jdankinloh.workers.dev" />
+      </div>
+      <div class="switch-row">
+        <span class="switch" id="autostart"></span>
+        <span class="switch-label">Запускать вместе с Windows</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot" id="settings-foot">
+    <button id="save" class="btn">Сохранить и подключить</button>
+  </div>
+
+  <div class="stack" id="pane-donations" style="display:none">
+    <div class="card">
+      <div class="pg-title">Последние донаты</div>
+      <div class="pg-desc">Оплаты, которые видела программа. «Повторить» — алерт в OBS без нового платежа.</div>
+      <div id="don-list"></div>
+      <button class="show-hidden" id="toggle-hidden" style="display:none"></button>
+    </div>
+  </div>
+
+  <div class="status" id="status">…</div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let autostartOn = true;
+
+    window.rsmine.loadSettings().then((s) => {
+      $('slug').value = s.slug || '';
+      $('appSecret').value = s.appSecret || '';
+      $('merchantId').value = s.merchantId || '';
+      $('apiBase').value = s.apiBase || '';
+      autostartOn = s.autostart !== false;
+      $('autostart').classList.toggle('on', autostartOn);
+      $('token-hint').textContent = s.tokenSet ? 'токен уже сохранён — поле можно оставить пустым' : '';
+      if (s.ttsKeySet) $('tts-hint').textContent = 'Ключ Cartesia уже сохранён — вставь новый, чтобы заменить.';
+    });
+    window.rsmine.getStatus().then(render);
+
+    function render(st) {
+      $('relay-label').textContent = st.relay;
+      $('dot').classList.toggle('on', st.relay === 'подключён');
+      $('status').innerHTML =
+        row('Релей', st.relay, st.relay === 'подключён') +
+        row('LZT', st.lzt) +
+        row('Cartesia', st.tts || '—') +
+        row('Аккаунт', st.slug || '—') +
+        row('Всё настроено', st.configured ? 'да' : 'нет');
+    }
+    function row(label, value, ok) {
+      return `<div class="srow"><span>${label}</span><b class="${ok === true ? 'ok' : ok === false ? 'bad' : ''}">${value}</b></div>`;
+    }
+    window.rsmine.onStatus(render);
+
+    $('autostart').onclick = () => { autostartOn = !autostartOn; $('autostart').classList.toggle('on', autostartOn); };
+
+    $('save').onclick = async () => {
+      $('save').disabled = true;
+      const st = await window.rsmine.saveSettings({
+        slug: $('slug').value.trim(),
+        appSecret: $('appSecret').value.trim(),
+        merchantId: $('merchantId').value.trim(),
+        apiBase: $('apiBase').value.trim(),
+        autostart: autostartOn,
+        token: $('token').value,
+        cartesiaKey: $('cartesiaKey').value,
+      });
+      $('token').value = '';
+      $('cartesiaKey').value = '';
+      $('token-hint').textContent = st.lzt === 'токен сохранён' ? 'токен сохранён' : '';
+      render(st);
+      $('save').disabled = false;
+    };
+    $('test').onclick = async () => {
+      $('test').disabled = true;
+      const r = await window.rsmine.testLzt();
+      render(await window.rsmine.getStatus());
+      $('test').disabled = false;
+      alert(r.ok ? ('LZT: ' + (r.note || 'ok')) : ('Ошибка: ' + r.error));
+    };
+
+    /* ── табы и сообщения ── */
+    let donLog = { items: [], hidden: [] };
+    let showHidden = false;
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    function switchTab(which) {
+      const settings = which === 'settings';
+      $('tab-settings').classList.toggle('on', settings);
+      $('tab-donations').classList.toggle('on', !settings);
+      $('pane-settings').style.display = settings ? '' : 'none';
+      $('settings-foot').style.display = settings ? '' : 'none';
+      $('pane-donations').style.display = settings ? 'none' : '';
+      if (!settings) refreshDonations();
+    }
+    $('tab-settings').onclick = () => switchTab('settings');
+    $('tab-donations').onclick = () => switchTab('donations');
+
+    /** Базовый словарь мата (твич-запрещёна + склонения + латинские аналоги) — тупо копия модуля moderation. */
+const DEFAULT_BANNED_WORDS = [
+  // гомофобия
+  'пидор', 'пидора', 'пидораса', 'пидорасу', 'пидорасом', 'пидорас', 'пидорасы',
+  'пидр', 'пидар', 'пидарас', 'пидараса',
+  // расизм (рус)
+  'негр', 'негра', 'небру', 'негром', 'негры', 'негров',
+  'хач', 'хача', 'хачу', 'хачом', 'хачи', 'хачик', 'хачика',
+  'чурка', 'чурки', 'чурку', 'чуркой',
+  'черномазый', 'черножопый', 'черножопые',
+  'узкоглазый', 'узкоглазые',
+  'хохол', 'хохла', 'хохлу', 'хохлом', 'хохлы', 'хохлов',
+  'москаль', 'москаля', 'москали', 'кацап', 'кацапа', 'кацапы',
+  'жид', 'жида', 'жиду', 'жидом', 'жиды', 'жидов',
+  'пиндос', 'пиндоса', 'пиндосы',
+  'чучмек', 'чучмека',
+  // нацизм
+  'гитлер', 'гитлера', 'гитлером',
+  // расизм/гомофобия (latin + транслит)
+  'nigga', 'nigger', 'niggers', 'ni**er', 'ниггер', 'ниггеры',
+  'faggot', 'faggots', 'fag',
+];
+
+/* ── фильтр мата (тот же словарь, что на сайте; список тянем из снапшота) ── */
+    const LEET = { a: 'а', e: 'е', o: 'о', p: 'р', c: 'с', x: 'х', m: 'м', t: 'т',
+      k: 'к', h: 'н', y: 'у', b: 'в', d: 'д', u: 'и', n: 'п',
+      '0': 'о', '1': 'и', '3': 'з', '4': 'ч', '6': 'б', '8': 'в' };
+    const normCh = (ch) => { const l = ch.toLowerCase(); return LEET[l] || l; };
+    const normWord = (s) => { let o = ''; const l = String(s || '').toLowerCase(); for (const ch of l) o += LEET[ch] || ch; return o; };
+    const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    let bannedWords = [...DEFAULT_BANNED_WORDS];
+    try { bannedWords = JSON.parse(localStorage.getItem('rsmine.banned') || '[]'); } catch { bannedWords = [...DEFAULT_BANNED_WORDS]; }
+    if (!Array.isArray(bannedWords)) bannedWords = [...DEFAULT_BANNED_WORDS];
+
+    async function refreshBanned() {
+      try {
+        const base = ($('apiBase').value.trim() || 'https://api.rsmine.ru').replace(/\/+$/, '');
+        const slug = $('slug').value.trim();
+        if (!slug) return;
+        const r = await fetch(`${base}/api/public/${encodeURIComponent(slug)}`);
+        const j = await r.json();
+        const list = j && j.publicConfig && Array.isArray(j.publicConfig.banned) ? j.publicConfig.banned : null;
+        if (list && list.length) {
+          // добавляем свои слова стримера к базовому списку, избегая дублей
+          const custom = list.filter(w => !DEFAULT_BANNED_WORDS.includes(w));
+          bannedWords = [...DEFAULT_BANNED_WORDS, ...custom];
+          try { localStorage.setItem('rsmine.banned', JSON.stringify(bannedWords)); } catch {}
+          renderDonations();
+        }
+      } catch { /* офлайн — работаем на кеше */ }
+    }
+
+    function maskWords(text, words) {
+      text = String(text || '');
+      if (!text || !words.length) return text;
+      let norm = '';
+      for (const ch of text) norm += normCh(ch);
+      const list = words.map(normWord).filter(Boolean);
+      if (!list.length) return text;
+      let reNorm, reRaw;
+try {
+          // упрощенные границы слова без Unicode property escapes (совместимо с любым движком)
+          const alt = (l) => `(?:^|[^\\wа-яё])(?:${l.map(escRe).join('|')})(?![\\wа-яё])`;
+          reNorm = new RegExp(alt(list), 'gi');
+          reRaw = new RegExp(alt(words.map((w) => String(w || ''))), 'gi');
+      } catch { return text; }
+      const spans = [];
+      norm.replace(reNorm, (m, off) => { spans.push([off, off + m.length]); return m; });
+      text.replace(reRaw, (m, off) => { spans.push([off, off + m.length]); return m; });
+      if (!spans.length) return text;
+      spans.sort((a, b) => a[0] - b[0]);
+      let out = '', last = 0;
+      for (const [s, e] of spans) {
+        if (s < last) continue;
+        out += text.slice(last, s) + '****';
+        last = Math.max(last, e);
+      }
+      return out + text.slice(last);
+    }
+
+    /* Относительное время как в панели: только что / N мин / N ч / N дн. */
+    function ago(ts) {
+      const sec = Math.max(0, Math.round((Date.now() - ts) / 1000));
+      if (sec < 60) return 'только что';
+      if (sec < 3600) return `${Math.round(sec / 60)} мин назад`;
+      if (sec < 86400) return `${Math.round(sec / 3600)} ч назад`;
+      const d = Math.round(sec / 86400);
+      if (d < 7) return `${d} дн назад`;
+      try {
+        return new Date(ts).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+      } catch { return ''; }
+    }
+
+    /* Аватарка как в панели: градиент по хешу ника + инициалы. */
+    const AVA_GRADS = [
+      ['#6ee7b7', '#10b981'], ['#c4b5fd', '#8b5cf6'], ['#7dd3fc', '#0284c7'],
+      ['#fcd34d', '#d97706'], ['#a5b4fc', '#4338ca'], ['#cbd5e1', '#64748b'],
+      ['#67e8f9', '#0e7490'],
+    ];
+    function avaStyle(name) {
+      let h = 0;
+      for (let i = 0; i < name.length; i++) h = ((h * 31 + name.charCodeAt(i)) >>> 0);
+      const [from, to] = AVA_GRADS[h % AVA_GRADS.length];
+      return `background:linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,0) 55%),linear-gradient(135deg, ${from}, ${to})`;
+    }
+
+    /* LD1-комментарий перевода → человекопонятное: текст + голос/эффект/аноним.
+       Сырую разметку зрителю техно-мусора не показываем. */
+    function parseLd1(comment) {
+      if (typeof comment !== 'string' || comment.indexOf('LD1|') !== 0) return null;
+      const parts = comment.split('|');
+      const out = { voice: '', effect: '', anonymous: false, text: '' };
+      let i = 1;
+      for (; i < parts.length; i++) {
+        const m = /^([A-Za-z])=(.*)$/.exec(parts[i]);
+        if (!m) break;
+        if (m[1] === 'v' && m[2]) out.voice = m[2];
+        else if (m[1] === 'e' && m[2]) out.effect = m[2];
+        else if (m[1] === 'a') out.anonymous = m[2] === '1';
+      }
+      out.text = parts.slice(i).join('|').split('').filter((ch) => {
+        const c = ch.charCodeAt(0);
+        return ch !== '|' && c >= 32 && c !== 127;
+      }).join('').replace(/\s+/g, ' ').trim().slice(0, 180);
+      return out;
+    }
+
+    function renderDonations() {
+      const hidden = new Set(donLog.hidden);
+      const visible = donLog.items.filter((d) => !hidden.has(d.invoiceId));
+      const hiddenItems = donLog.items.filter((d) => hidden.has(d.invoiceId));
+      $('don-count').textContent = visible.length ? ` · ${visible.length}` : '';
+      const list = showHidden ? donLog.items : visible;
+      if (!list.length) {
+        $('don-list').innerHTML = `<div class="dempty"><b>Пока тихо</b>Оплаченные донаты появятся здесь.</div>`;
+      } else {
+        $('don-list').innerHTML = list.map((d) => {
+          const isH = hidden.has(d.invoiceId);
+          const p = parseLd1(d.text);
+          const name = (p && p.anonymous) ? 'Аноним' : (d.username || 'зритель');
+          const initials = esc(name.slice(0, 2).toUpperCase());
+          const text = maskWords(p ? p.text : String(d.text || ''), bannedWords);
+          const chips = (p && (p.voice || p.effect))
+            ? `<div class="dchips">` +
+              (p.voice ? `<span class="dchip">Голос · ${esc(p.voice)}</span>` : '') +
+              (p.effect ? `<span class="dchip">Эффект · ${esc(p.effect)}</span>` : '') +
+              `</div>`
+            : '';
+          const acts = isH
+            ? `<button class="mini" data-act="unhide">Показать</button>`
+            : `<button class="mini" data-act="replay">` +
+              `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>` +
+              `Повторить</button>` +
+              `<button class="mini" data-act="hide">` +
+              `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.5 10.5 0 0 1 12 19C5 19 1 12 1 12a21.8 21.8 0 0 1 5.06-5.94M9.9 4.24A9.5 9.5 0 0 1 12 5c7 0 11 7 11 7a21.7 21.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>` +
+              `Скрыть</button>`;
+          return `<div class="drow${isH ? ' is-hidden' : ''}" data-id="${d.invoiceId}">` +
+            `<span class="dava" style="${avaStyle(name)}">${initials}</span>` +
+            `<div class="dmain">` +
+            `<div class="dwho"><span class="nm">${esc(name)}</span><span class="sent">отправил</span>` +
+            `<span class="sum">${esc(d.sum)} ₽</span><span class="dwhen">${esc(ago(d.ts))}</span></div>` +
+            (text ? `<div class="dtxt">${esc(text)}</div>` : '') + chips +
+            `<div class="dact">${acts}</div>` +
+            `</div></div>`;
+        }).join('');
+      }
+      const t = $('toggle-hidden');
+      if (!showHidden && hiddenItems.length) {
+        t.style.display = '';
+        t.textContent = `Показать скрытые (${hiddenItems.length})`;
+      } else if (showHidden && hiddenItems.length) {
+        t.style.display = '';
+        t.textContent = 'Скрыть скрытые';
+      } else {
+        t.style.display = 'none';
+      }
+    }
+
+    async function refreshDonations() {
+      try { donLog = await window.rsmine.listDonations(); } catch { /* окно без main */ }
+      renderDonations();
+    }
+    window.rsmine.onDonations((log) => { donLog = log; renderDonations(); });
+    refreshDonations();
+    refreshBanned();
+    window.setInterval(refreshDonations, 5000);
+    window.setInterval(refreshBanned, 5 * 60 * 1000);
+
+    $('toggle-hidden').onclick = () => { showHidden = !showHidden; renderDonations(); };
+    $('don-list').onclick = async (e) => {
+      const btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      const row = btn.closest('.drow');
+      const id = Number(row && row.dataset.id);
+      if (!Number.isFinite(id)) return;
+      const act = btn.dataset.act;
+      btn.disabled = true;
+      try {
+        if (act === 'replay') await window.rsmine.replayDonation(id);
+        else if (act === 'hide') donLog = await window.rsmine.hideDonation(id);
+        else if (act === 'unhide') donLog = await window.rsmine.unhideDonation(id);
+      } catch { /* main недоступен */ }
+      renderDonations();
+    };
+  </script>
+</body>
+</html>
