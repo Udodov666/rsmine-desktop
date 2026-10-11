@@ -51,7 +51,7 @@
 ## Сборка из исходников (для разработчиков)
 
 ```bash
-git clone https://github.com/jdankinloh/rsmine-desktop
+git clone https://github.com/Udodov666/rsmine-desktop
 cd rsmine-desktop
 npm install
 npm start        # запуск без сборки
