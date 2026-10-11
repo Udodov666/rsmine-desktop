@@ -23,7 +23,7 @@ jobs:
         run: npm ci
 
       - name: Build installer
-        run: npx electron-builder --win nsis --publish never
+        run: npx electron-builder --win --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
