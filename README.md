@@ -4,9 +4,11 @@
 
 ## Скачать
 
-👉 **[Скачать RSMine для Windows (установщик)](../../releases/latest/download/RSMine-Setup-1.3.1.exe)**
+👉 **[Страница загрузки (всегда последняя версия)](../../releases/latest)**
 
-Также на странице [Releases](../../releases) доступна portable-версия (без установки).
+Прямые ссылки на файлы текущего релиза:
+- [RSMine-Setup-1.3.1.exe](../../releases/latest/download/RSMine-Setup-1.3.1.exe) — установщик (рекомендуется)
+- [RSMine-Portable.exe](../../releases/latest/download/RSMine-Portable.exe) — portable, без установки
 
 > Системные требования: Windows 10/11 (64-bit). macOS и Linux — по запросу.
 

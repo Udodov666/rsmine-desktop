@@ -22,13 +22,18 @@
     ],
     "win": {
       "target": [
-        "nsis"
+        "nsis",
+        "portable"
       ],
       "icon": "build/icon.png"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "RSMine-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "RSMine-Portable.${ext}"
     }
   },
   "dependencies": {
